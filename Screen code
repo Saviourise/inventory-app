@@ -1,0 +1,210 @@
+####################################
+###                     Importing Starts                       ###
+####################################
+
+from kivymd.theming import ThemeManager
+
+from kivymd.app import MDApp
+
+from kivymd.uix.screen import Screen
+
+from kivymd.toast import toast
+
+import sqlite3 as sql
+
+from kivy.uix.image import Image
+
+from kivymd.uix.button import MDRectangleFlatButton, MDFlatButton,MDFloatingActionButtonSpeedDial, MDTextButton, MDIconButton, MDFloatingActionButton, MDRectangleFlatIconButton, MDRaisedButton
+
+from kivy.lang import Builder
+
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+from kivy.uix.boxlayout import BoxLayout
+
+from kivy.properties import ObjectProperty
+
+from kivymd.uix.dialog import MDDialog
+
+from kivy.metrics import dp
+
+from kivymd.uix.picker import MDThemePicker as tp
+
+import time
+
+####################################
+###                      Importing Ends                        ###
+####################################
+
+
+####################################
+###                   Builder Code Starts                      ###
+####################################
+
+
+##########    Layout Screens    ############
+
+screens = """
+MyLayout:
+    orientation: 'vertical'
+    scr_mngr: scr_mngr
+    ScreenManager:
+        id: scr_mngr
+        screen1: screen1.__self__
+        HomeScreen:
+            id: screen1
+            name: 'screen1'
+            NavigationLayout:
+                ScreenManager:
+                    Screen:
+                        BoxLayout:
+                            orientation:"vertical"
+                            MDToolbar:
+                                id: toolbar
+                                left_action_items: [['menu', lambda x: nav_drawer.toggle_nav_drawer()]]
+                                title:"Items"
+                                elevation: 9
+                                
+                                    
+                            Widget:
+                                
+                MDNavigationDrawer:
+                    id: nav_drawer
+                    
+                    BoxLayout:
+                        id: bl
+                        orientation:"vertical"
+                        padding: '8dp'
+                        spacing: '8dp'
+                                
+                            
+                        ScrollView:
+                            id: ll
+                            MDList:
+                                OneLineIconListItem:
+                                    text:"Register New Item"
+                                    on_release: nav_drawer.toggle_nav_drawer()
+                                    IconLeftWidget:
+                                        icon:"plus"
+                                        on_release: nav_drawer.toggle_nav_drawer()
+                                        
+                                OneLineIconListItem:
+                                    text:"Settings"
+                                    on_release: nav_drawer.toggle_nav_drawer()
+                                    IconLeftWidget:
+                                        icon:"tools"
+                                        on_release: nav_drawer.toggle_nav_drawer()
+                                        
+                                OneLineIconListItem:
+                                    text:"View and Edit Items"
+                                    on_release: nav_drawer.toggle_nav_drawer()
+                                    IconLeftWidget:
+                                        icon:"pen"
+                                        on_release: nav_drawer.toggle_nav_drawer()
+
+"""
+
+
+####################################
+###                   Builder Code Ends                      ###
+####################################
+
+
+####################################
+###              Main Layout Class Starts                 ###
+####################################
+
+
+##########    Layout Class     ##########
+class MyLayout(BoxLayout):
+    
+    scr_mngr = ObjectProperty(None)
+       
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    
+
+####################################
+###               Main Layout Class Ends                  ###
+####################################
+
+
+
+
+
+####################################
+###       Adding all Screen Together Starts         ###
+####################################
+
+
+
+### ChangePassword screen class in MyLayout ##
+class HomeScreen(Screen):
+    pass
+    
+
+
+## Create the screen manager ##
+sm = ScreenManager()
+sm.add_widget(HomeScreen(name='screen1'))
+
+
+####################################
+###        Adding all Screen Together Ends          ###
+####################################
+
+
+
+####################################
+###                Main App Class Starts                  ###
+####################################
+
+
+ 
+##########    Main App Class   ##########
+class DemoApp(MDApp):
+    
+    
+
+    
+            
+    ##########   Main App Function  ##########
+    def build(self):
+            
+        
+        ##########  Build all screens   ##########
+        screen = Builder.load_string(screens)
+        
+        ### Return built screens ##
+        return screen
+            
+
+        
+####################################
+###                  Main App Class Ends                   ###
+####################################
+
+            
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##########    Run the app    ##########
+if __name__ == '__main__':
+    DemoApp().run()
