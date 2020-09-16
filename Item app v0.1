@@ -1,0 +1,432 @@
+####################################
+###                     Importing Starts                       ###
+####################################
+
+from kivymd.app import MDApp
+
+from kivymd.uix.screen import Screen
+
+from kivymd.toast import toast
+
+from kivymd.uix.list import ThreeLineListItem
+
+import sqlite3 as sql
+
+from kivy.lang import Builder
+
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+from kivy.factory import Factory
+
+from kivy.uix.boxlayout import BoxLayout
+
+from kivy.properties import ObjectProperty
+
+from kivymd.uix.dialog import MDDialog
+
+from kivymd.uix.picker import MDDatePicker
+
+import time
+
+####################################
+###                      Importing Ends                        ###
+####################################
+
+
+####################################
+###                   Builder Code Starts                      ###
+####################################
+
+
+##########    Layout Screens    ############
+
+screens = """
+MyLayout:
+    orientation: 'vertical'
+    scr_mngr: scr_mngr
+    datelabel: datelabel
+    toolbar: toolbar.__self__
+    add: add.__self__
+    container: container
+    item: item
+    price: price
+    date: date
+    ScreenManager:
+        id: scr_mngr
+        screen1: screen1.__self__
+        screen2: screen2.__self__
+        HomeScreen:
+            id: screen1
+            name: 'screen1'
+            MDToolbar:
+                pos_hint: {"top": 1}
+                id: toolbar
+                left_action_items: [['menu', lambda x: nav_drawer.toggle_nav_drawer()]]
+                title:"Items"
+                elevation: 9
+                                
+            Widget:
+            MDRaisedButton:
+                id: add
+                text:"Register New Item"
+                on_press: root.news()
+                pos_hint:{"center_x":0.5, "center_y":0.87}
+                                            
+                
+            MDCard:
+                id:mdc
+                orientation: "vertical"
+                padding: "8dp"
+                size_hint: None, None
+                size: "380dp", "700dp"
+                pos_hint: {"center_x": .5, "center_y": .4}
+        
+                MDLabel:
+                    text: "Items List"
+                    size_hint_y: None
+                    font_size:20
+                    
+        
+                MDSeparator:
+                    height: "1dp"
+                
+                ScrollView:
+                    MDList:
+                        id: container
+                
+            NavigationLayout:
+                x: toolbar.height
+                size_hint_y: 1.0 - toolbar.height/root.height
+                ScreenManager:
+                    Screen:
+                        BoxLayout:
+                            orientation:"vertical"
+                            
+                                
+                ScreenManager:
+                    Screen:
+                        MDNavigationDrawer:
+                            id: nav_drawer
+                            
+                            BoxLayout:
+                                id: bl
+                                orientation:"vertical"
+                                padding: '8dp'
+                                spacing: '8dp'
+                                        
+                                    
+                                ScrollView:
+                                    id: ll
+                                    MDList:
+                                        OneLineIconListItem:
+                                            text:"Register New Item"
+                                            on_press: root.news()
+                                            on_release: nav_drawer.toggle_nav_drawer()
+                                            IconLeftWidget:
+                                                icon:"plus"
+                                                on_press: root.news()
+                                                on_release: nav_drawer.toggle_nav_drawer()
+                                                
+                                        OneLineIconListItem:
+                                            text:"Settings"
+                                            on_release: nav_drawer.toggle_nav_drawer()
+                                            IconLeftWidget:
+                                                icon:"tools"
+                                                on_release: nav_drawer.toggle_nav_drawer()
+                                                
+                                        OneLineIconListItem:
+                                            text:"View and Edit Items"
+                                            on_release: nav_drawer.toggle_nav_drawer()
+                                            IconLeftWidget:
+                                                icon:"pen"
+                                                on_release: nav_drawer.toggle_nav_drawer()
+                                                
+                        
+            
+             
+        NewScreen:
+            id: screen2
+            name: 'screen2'
+            MDLabel:
+                text:"Register New Item"
+                pos_hint:{"center_x":0.84, "center_y":0.92}
+                theme_text_color: "Custom"
+                text_color: [0,0,0.6,1]
+                size_hint_y: None
+                font_size:30
+                
+            MDTextField:
+                id: item
+                mode:"fill"
+                fill_color: 0, 0, 0, .4
+                color_mode:"custom"
+                line_color_focus:  [0, 0, 1, 1]
+                required: True
+                hint_text: "Name of Item"
+                helper_text: "Enter an item name"
+                helper_text_mode: "on_error"
+                icon_right: "plus"
+                icon_right_color: [0, 0, 1, 1]
+                pos_hint: {'center_x':0.5, 'center_y':0.8}
+                size_hint_x: (0.9)
+                size_hint_y: None
+                height:20
+                    
+            MDTextField:
+                id: price
+                mode:"fill"
+                fill_color: 0, 0, 0, .4
+                color_mode:"custom"
+                line_color_focus:  [0,0,1,1]
+                required:True
+                hint_text: "Enter the price"
+                helper_text: "Enter the price"
+                helper_text_mode: "on_error"
+                icon_right: "cash-plus"
+                icon_right_color: [0,0,1,1]
+                pos_hint: {'center_x':0.5, 'center_y':0.68}
+                size_hint_x: (0.9)
+                size_hint_y: None
+                height:20
+                        
+            MDRaisedButton:
+                id: date
+                text:"Select purchased date"
+                on_press:root.show_date()
+                pos_hint: {'center_x':0.5, 'center_y':0.55}
+                size_hint_x: (0.5)
+                size_hint_y: None
+                height:90
+                
+            MDLabel:
+                id:datelabel
+                text:"Date Purchased: "
+                pos_hint:{"center_x":0.8, "center_y":0.47}
+                
+            MDRaisedButton:
+                id:add
+                text:"Add"
+                on_press: root.additem()
+                pos_hint:{"center_x":0.5, "center_y":0.4}
+            
+            MDFlatButton:
+                text:"Back"
+                on_press: root.homes()
+                pos_hint:{"center_x":0.5, "center_y":0.33}
+    
+"""
+
+
+####################################
+###                   Builder Code Ends                      ###
+####################################
+
+
+####################################
+###              Main Layout Class Starts                 ###
+####################################
+
+
+##########    Layout Class     ##########
+class MyLayout(BoxLayout):
+    
+    
+    
+    ### Create Database For Storing User Data ###
+    try:
+        con = sql.connect('goods.db')
+        cur = con.cursor()
+        cur.execute(""" CREATE TABLE itemgood(
+        item blod,
+        price blob,
+        date blob
+        )""")
+        con.commit()
+        con.close()
+        print("Table Created Successfully")
+    except:
+        print('Table exists')
+        
+        
+
+            
+    scr_mngr = ObjectProperty(None)
+    
+    toolbar = ObjectProperty(None)
+       
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+    def news(self):
+        self.scr_mngr.current = 'screen2'
+        
+    def homes(self):
+        self.scr_mngr.current = 'screen1'
+        
+    def get_date(self, date):
+        self.date = date
+        self.datelabel.text = "Date Purchased: " + str(date)
+        print(date)
+        '''
+        :type date: <class 'datetime.date'>
+        '''
+    day = time.strftime("%d")
+    month = time.strftime("%m")
+    year = time.strftime("%Y")
+            
+    def show_date(self):
+        day = time.strftime("%d")
+        month = time.strftime("%m")
+        yearr = time.strftime("%Y")
+        
+        date_dialog = MDDatePicker(
+            callback=self.get_date,
+            year=int(yearr),
+            month=int(month),
+            day=int(day)
+        )
+        date_dialog.open()
+        
+        
+    def additem(self):
+        item = self.item.text
+        price = self.price.text
+        datte = self.datelabel
+        if item != "" and price != "" and datte != "":
+            try:
+                ## Add create account details to users database table after validation is successful ##
+                con = sql.connect("goods.db")
+                cur = con.cursor()
+                cur.execute(""" INSERT INTO itemgood(item, price, date) VALUES (?, ?, ?)""", (item, price, self.date))
+                con.commit()
+                con.close()
+                self.scr_mngr.current = 'screen1'
+                self.show_toast("Item registered successfully")
+                self.container.add_widget(
+                ThreeLineListItem(text=item, secondary_text="Last Purchased: " + str(self.date), tertiary_text="Price: " + str(price)
+                        )
+                        )
+                self.item.text = ("")
+                self.price.text = ("")
+            except:
+                self.show_toast("Please pick a purchase date")
+               
+        else:
+            self.show_toast("Please fill all input")
+        
+            
+    def show_toast(self, ti):
+        '''Displays a toast on the screen.'''
+        
+
+        toast(ti)
+    
+
+####################################
+###               Main Layout Class Ends                  ###
+####################################
+
+
+
+
+
+####################################
+###       Adding all Screen Together Starts         ###
+####################################
+
+
+
+### ChangePassword screen class in MyLayout ##
+class HomeScreen(Screen):
+    pass
+    
+class NewScreen(Screen):
+    pass
+    
+
+
+## Create the screen manager ##
+sm = ScreenManager()
+sm.add_widget(HomeScreen(name='screen1'))
+sm.add_widget(NewScreen(name='screen2'))
+
+
+
+####################################
+###        Adding all Screen Together Ends          ###
+####################################
+
+
+
+####################################
+###                Main App Class Starts                  ###
+####################################
+
+
+ 
+##########    Main App Class   ##########
+class DemoApp(MDApp):
+    
+    
+
+    
+            
+    ##########   Main App Function  ##########
+    def build(self):
+            
+        
+        ##########  Build all screens   ##########
+        screen = Builder.load_string(screens)
+        
+        ### Return built screens ##
+        return screen
+        
+    def on_start(self):
+        con = sql.connect('goods.db')
+        cur = con.cursor()
+        cur.execute("SELECT * FROM itemgood")
+        item = cur.fetchall()
+        t = 0
+        try:
+            while t >=0:
+                print(item[t][0])
+                print(item[t][2])
+                print(item[t][1])
+                self.root.ids.container.add_widget(
+                ThreeLineListItem(text=item[t][0], secondary_text="Last Purchased: " + str(item[t][2]), tertiary_text="Price: " + str(item[t][1])
+                )
+                )
+                t=t+1
+        except:
+            pass
+            
+
+        
+####################################
+###                  Main App Class Ends                   ###
+####################################
+
+            
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##########    Run the app    ##########
+if __name__ == '__main__':
+    DemoApp().run()
