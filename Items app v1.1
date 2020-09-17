@@ -1,0 +1,1609 @@
+####################################
+
+###                     Importing Starts                       ###
+
+####################################
+
+from kivymd.app import MDApp
+
+from kivymd.uix.screen import Screen
+
+from kivymd.toast import toast
+
+from kivymd.uix.list import ThreeLineListItem, IconLeftWidget
+
+import sqlite3 as sql
+
+from kivy.lang import Builder
+
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+from kivy.uix.boxlayout import BoxLayout
+
+from kivy.properties import ObjectProperty
+
+from kivymd.uix.dialog import MDDialog
+
+from kivymd.uix.picker import MDDatePicker
+
+import time
+
+####################################
+
+###                      Importing Ends                        ###
+
+####################################
+
+####################################
+
+###                   Builder Code Starts                      ###
+
+####################################
+
+##########    Layout Screens    ############
+
+screens = """
+
+MyLayout:
+
+    orientation: 'vertical'
+
+    scr_mngr: scr_mngr
+
+    datelabel: datelabel
+
+    toolbar: toolbar.__self__
+
+    sc:sc
+
+    add: add.__self__
+
+    container: container.__self__
+
+    containers: containers.__self__
+
+    rl:rl
+
+    item: item
+
+    price: price
+
+    date: date
+
+    itemname: itemname
+
+    editeditem: editeditem
+
+    editedprice: editedprice
+
+    datelabeledit: datelabeledit
+
+    ScreenManager:
+
+        id: scr_mngr
+
+        screen1: screen1.__self__
+
+        screen2: screen2.__self__
+
+        screen3: screen3.__self__
+
+        screen3: screen4.__self__
+
+        HomeScreen:
+
+            id: screen1
+
+            name: 'screen1'
+
+            MDToolbar:
+
+                pos_hint: {"top": 1}
+
+                id: toolbar
+
+                left_action_items: [['menu', lambda x: nav_drawer.toggle_nav_drawer()]]
+
+                title:"Items"
+
+                elevation: 9
+
+                                
+
+            Widget:
+
+            MDRaisedButton:
+
+                id: add
+
+                text:"Register New Item"
+
+                on_press: root.news()
+
+                pos_hint:{"center_x":0.5, "center_y":0.87}
+
+            
+
+            MDCard:
+
+                id:mdc
+
+                orientation: "vertical"
+
+                padding: "8dp"
+
+                size_hint: None, None
+
+                size: "380dp", "700dp"
+
+                pos_hint: {"center_x": .5, "center_y": .4}
+
+        
+
+                MDLabel:
+
+                    text: "Items List"
+
+                    size_hint_y: None
+
+                    font_size:20
+
+                    
+
+        
+
+                MDSeparator:
+
+                    height: "1dp"
+
+                
+
+                ScrollView:
+
+                    id: container
+
+                    MDList:
+
+                        id: container
+
+                
+
+            NavigationLayout:
+
+                x: toolbar.height
+
+                size_hint_y: 1.0 - toolbar.height/root.height
+
+                ScreenManager:
+
+                    Screen:
+
+                        BoxLayout:
+
+                            orientation:"vertical"
+
+                            
+
+                                
+
+                ScreenManager:
+
+                    Screen:
+
+                        MDNavigationDrawer:
+
+                            id: nav_drawer
+
+                            
+
+                            BoxLayout:
+
+                                id: bl
+
+                                orientation:"vertical"
+
+                                padding: '8dp'
+
+                                spacing: '8dp'
+
+                                        
+
+                                    
+
+                                ScrollView:
+
+                                    id: ll
+
+                                    MDList:
+
+                                        OneLineIconListItem:
+
+                                            text:"Register New Item"
+
+                                            on_press: root.news()
+
+                                            on_release: nav_drawer.toggle_nav_drawer()
+
+                                            IconLeftWidget:
+
+                                                icon:"plus"
+
+                                                on_press: root.news()
+
+                                                on_release: nav_drawer.toggle_nav_drawer()
+
+                                                
+
+                                        OneLineIconListItem:
+
+                                            text:"Settings"
+
+                                            on_release: nav_drawer.toggle_nav_drawer()
+
+                                            IconLeftWidget:
+
+                                                icon:"tools"
+
+                                                on_release: nav_drawer.toggle_nav_drawer()
+
+                                                
+
+                                        OneLineIconListItem:
+
+                                            text:"View and Edit Items"
+
+                                            on_press: root.vs()
+
+                                            on_release: nav_drawer.toggle_nav_drawer()
+
+                                            IconLeftWidget:
+
+                                                icon:"pen"
+
+                                                on_press: root.vs
+
+                                                on_release: nav_drawer.toggle_nav_drawer()
+
+                                                
+
+                        
+
+            
+
+             
+
+        NewScreen:
+
+            id: screen2
+
+            name: 'screen2'
+
+            MDLabel:
+
+                text:"Register New Item"
+
+                pos_hint:{"center_x":0.84, "center_y":0.92}
+
+                theme_text_color: "Custom"
+
+                text_color: [0,0,0.6,1]
+
+                size_hint_y: None
+
+                font_size:30
+
+                
+
+            MDTextField:
+
+                id: item
+
+                mode:"fill"
+
+                fill_color: 0, 0, 0, .4
+
+                color_mode:"custom"
+
+                line_color_focus:  [0, 0, 1, 1]
+
+                required: True
+
+                hint_text: "Name of Item"
+
+                helper_text: "Enter an item name"
+
+                helper_text_mode: "on_error"
+
+                icon_right: "plus"
+
+                icon_right_color: [0, 0, 1, 1]
+
+                pos_hint: {'center_x':0.5, 'center_y':0.8}
+
+                size_hint_x: (0.9)
+
+                size_hint_y: None
+
+                height:20
+
+                    
+
+            MDTextField:
+
+                id: price
+
+                mode:"fill"
+
+                fill_color: 0, 0, 0, .4
+
+                color_mode:"custom"
+
+                line_color_focus:  [0,0,1,1]
+
+                required:True
+
+                hint_text: "Enter the price"
+
+                helper_text: "Enter the price"
+
+                helper_text_mode: "on_error"
+
+                icon_right: "cash-plus"
+
+                icon_right_color: [0,0,1,1]
+
+                pos_hint: {'center_x':0.5, 'center_y':0.68}
+
+                size_hint_x: (0.9)
+
+                size_hint_y: None
+
+                height:20
+
+                        
+
+            MDRaisedButton:
+
+                id: date
+
+                text:"Select purchased date"
+
+                on_press:root.show_date()
+
+                pos_hint: {'center_x':0.5, 'center_y':0.55}
+
+                size_hint_x: (0.5)
+
+                size_hint_y: None
+
+                height:90
+
+                
+
+            MDLabel:
+
+                id:datelabel
+
+                text:"Date Purchased: "
+
+                pos_hint:{"center_x":0.8, "center_y":0.47}
+
+                
+
+            MDRaisedButton:
+
+                id:add
+
+                text:"Add"
+
+                on_press: root.additem()
+
+                pos_hint:{"center_x":0.5, "center_y":0.4}
+
+            
+
+            MDFlatButton:
+
+                text:"Back"
+
+                on_press: root.homes()
+
+                pos_hint:{"center_x":0.5, "center_y":0.33}
+
+    
+
+        ViewScreen:
+
+            id: screen3
+
+            name: 'screen3'
+
+            MDIconButton:
+
+                icon:"arrow-left"
+
+                theme_text_color:"Custom"
+
+                text_color:[0,0,1,1]
+
+                pos_hint:{'center_x':0.1, 'center_y':0.95}
+
+                on_press:root.homes()
+
+                
+
+            MDRaisedButton:
+
+                text:"Edit An Item"
+
+                theme_text_color:"Custom"
+
+                text_color:[0,0,1,1]
+
+                pos_hint:{'center_x':0.7, 'center_y':0.93}
+
+                on_press:root.editroom()
+
+            
+
+            MDRaisedButton:
+
+                id: rl
+
+                text:"Refresh List"
+
+                disabled: True
+
+                theme_text_color:"Custom"
+
+                text_color:[0,0,1,1]
+
+                pos_hint:{'center_x':0.3, 'center_y':0.93}
+
+                on_press:root.refresh()
+
+            
+
+            MDCard:
+
+                id:mdc
+
+                orientation: "vertical"
+
+                padding: "8dp"
+
+                size_hint: None, None
+
+                size: "380dp", "800dp"
+
+                pos_hint: {"center_x": .5, "center_y": .4}
+
+        
+
+                MDLabel:
+
+                    text: "Items List (click on any item to edit it)"
+
+                    size_hint_y: None
+
+                    font_size:20
+
+                    
+
+        
+
+                MDSeparator:
+
+                    height: "1dp"
+
+                
+
+                ScrollView:
+
+                    id: sc
+
+                    MDList:
+
+                        id: containers
+
+                        
+
+        EditScreen:
+
+            id: screen4
+
+            name: 'screen4'
+
+            
+
+            MDIconButton:
+
+                icon:"arrow-left"
+
+                theme_text_color:"Custom"
+
+                text_color:[0,0,1,1]
+
+                pos_hint:{'center_x':0.1, 'center_y':0.95}
+
+                on_press:root.vs()
+
+                
+
+            MDLabel:
+
+                id:itemname
+
+                text:"Edit Item"
+
+                pos_hint:{"center_x":0.92, "center_y":0.92}
+
+                theme_text_color: "Custom"
+
+                text_color: [0,0,0.6,1]
+
+                size_hint_y: None
+
+                font_size:30
+
+                
+
+            MDTextField:
+
+                id: editeditem
+
+                mode:"fill"
+
+                fill_color: 0, 0, 0, .4
+
+                color_mode:"custom"
+
+                line_color_focus:  [0, 0, 1, 1]
+
+                required:True
+
+                hint_text: "Name of Item"
+
+                helper_text: "This field is compulsory"
+
+                helper_text_mode: "on_focus"
+
+                icon_right: "plus"
+
+                icon_right_color: [0, 0, 1, 1]
+
+                pos_hint: {'center_x':0.5, 'center_y':0.8}
+
+                size_hint_x: (0.9)
+
+                size_hint_y: None
+
+                height:20
+
+                    
+
+            MDTextField:
+
+                id: editedprice
+
+                mode:"fill"
+
+                fill_color: 0, 0, 0, .4
+
+                color_mode:"custom"
+
+                line_color_focus:  [0,0,1,1]
+
+                hint_text: "Enter the New price"
+
+                helper_text: "This field is optional"
+
+                helper_text_mode: "on_focus"
+
+                icon_right: "cash-plus"
+
+                icon_right_color: [0,0,1,1]
+
+                pos_hint: {'center_x':0.5, 'center_y':0.68}
+
+                size_hint_x: (0.9)
+
+                size_hint_y: None
+
+                height:20
+
+                        
+
+            MDRaisedButton:
+
+                id: date
+
+                text:"Select repurchased date"
+
+                on_press:root.show_dateedit()
+
+                pos_hint: {'center_x':0.5, 'center_y':0.55}
+
+                size_hint_x: (0.5)
+
+                size_hint_y: None
+
+                height:90
+
+                
+
+            MDLabel:
+
+                id:datelabeledit
+
+                text:"Date Repurchased: "
+
+                pos_hint:{"center_x":0.8, "center_y":0.47}
+
+                
+
+            MDRaisedButton:
+
+                id:add
+
+                text:"Change"
+
+                on_press: root.edititem()
+
+                pos_hint:{"center_x":0.5, "center_y":0.4}
+
+            
+
+    
+
+"""
+
+####################################
+
+###                   Builder Code Ends                      ###
+
+####################################
+
+####################################
+
+###              Main Layout Class Starts                 ###
+
+####################################
+
+##########    Layout Class     ##########
+
+class MyLayout(BoxLayout):
+
+    
+
+    ## setting the object property for the item lists(In an attemp to solve attribute error)
+
+    container = ObjectProperty(None)
+
+    
+
+    containers = ObjectProperty(None)
+
+    
+
+    ## Date Function ##
+
+    def get_date(self, date):
+
+        self.date = date
+
+        self.datelabel.text = "Date Purchased: " + str(date)
+
+        print(date)
+
+        '''
+
+        :type date: <class 'datetime.date'>
+
+        '''
+
+    day = time.strftime("%d")
+
+    month = time.strftime("%m")
+
+    year = time.strftime("%Y")
+
+            
+
+            
+
+            
+
+    ## When the select date button is clicked, this function below is called and the below function calls the above get_date function to get the date registered and store it so that it can be stored in the database
+
+    def show_date(self):
+
+        day = time.strftime("%d")
+
+        month = time.strftime("%m")
+
+        yearr = time.strftime("%Y")
+
+        
+
+        date_dialog = MDDatePicker(
+
+            callback=self.get_date,
+
+            year=int(yearr),
+
+            month=int(month),
+
+            day=int(day)
+
+        )
+
+        date_dialog.open()
+
+        
+
+        
+
+    ## When editing an item, if the last purchased date is changed, this function is called
+
+    def get_dateedit(self, dateedit):
+
+        self.dateedit = dateedit
+
+        self.datelabeledit.text = "Date Repurchased: " + str(dateedit)
+
+        print(dateedit)
+
+        '''
+
+        :type date: <class 'datetime.date'>
+
+        '''
+
+    day = time.strftime("%d")
+
+    month = time.strftime("%m")
+
+    year = time.strftime("%Y")
+
+            
+
+        ## When the edit last purchased date button is clicked, this function below is called and the below function calls the above get_dateedit function to get the last purchased date that was added and store it so that it can be stored in the database
+
+    def show_dateedit(self):
+
+        day = time.strftime("%d")
+
+        month = time.strftime("%m")
+
+        yearr = time.strftime("%Y")
+
+        
+
+        date_dialog = MDDatePicker(
+
+            callback=self.get_dateedit,
+
+            year=int(yearr),
+
+            month=int(month),
+
+            day=int(day)
+
+        )
+
+        date_dialog.open()
+
+        
+
+        
+
+    ## Function used to update date in the database if it is changed
+
+    def updatedate(self, itna, chda):    ### Connect to Users Database ##
+
+        con = sql.connect("goods.db")
+
+        cur = con.cursor()
+
+        cur.execute(""" UPDATE itemgood SET date = :date WHERE item = :item""",{'item':itna, 'date': chda})
+
+        con.commit()
+
+        con.close()
+
+        
+
+        
+
+    ##Function used to update price in the database if it is changed or edited
+
+    def updateprice(self, itna, chpr):    ### Connect to Users Database ##
+
+        con = sql.connect("goods.db")
+
+        cur = con.cursor()
+
+        cur.execute(""" UPDATE itemgood SET price = :price WHERE item = :item""",{'item':itna, 'price': chpr})
+
+        con.commit()
+
+        con.close()
+
+        
+
+        
+
+    ## Edit Items function ##
+
+    def edititem(self):
+
+        ## Item name, updated price and updated date is collected
+
+        editeditem = self.editeditem.text
+
+        editedprice= self.editedprice.text
+
+        datee = self.datelabeledit.text
+
+        
+
+        ## if the date is changed, it collects if from the get_dateedit function and stores it
+
+        try:
+
+            dateedit = self.dateedit
+
+        except:
+
+            dateedit = ""
+
+        
+
+        ## this function is called when an item is trying to be updated. it compares the data given with the one in the database and changes it 
+
+        if editeditem != "":
+
+            con = sql.connect("goods.db")
+
+            cur = con.cursor()
+
+            cur.execute("SELECT * FROM itemgood")
+
+            itemlist = cur.fetchall()
+
+            try:
+
+                t = 0
+
+                while t>=0:
+
+                    uu = itemlist[t][0]
+
+                    if uu == editeditem:
+
+                        break
+
+                        t+=1
+
+                    else:
+
+                        break
+
+                        self.show_toast("Item Not Found")
+
+            except:
+
+                self.show_toast("Item Not Found")
+
+                
+
+            if editedprice != "" and dateedit != "":
+
+                
+
+                if dateedit != "":
+
+                    con = sql.connect("goods.db")
+
+                    cur = con.cursor()
+
+                    cur.execute("SELECT * FROM itemgood")
+
+                    itemlist = cur.fetchall()
+
+                    try:
+
+                        t = 0
+
+                        while t>=0:
+
+                            uu = itemlist[t][0]
+
+                            if uu == editeditem:
+
+                                break
+
+                            t+=1
+
+                    except:
+
+                        self.show_toast("Item Not Found")
+
+                    if (uu == editeditem):
+
+                        self.updatedate(editeditem, dateedit)
+
+                        self.updateprice(editeditem, editedprice)
+
+                        self.show_toast("Item Edited Successfully")
+
+                        con = sql.connect('goods.db')
+
+                        cur = con.cursor()
+
+                        cur.execute("SELECT * FROM itemgood")
+
+                        item = cur.fetchall()
+
+                        print(item)
+
+                        t =0
+
+#                        self.container.clear_widgets()
+
+#                        self.containers.clear_widgets()
+
+                        #DemoApp().on_start()
+
+                        self.clr()
+
+                        self.vs()
+
+                    else:
+
+                        pass
+
+            elif editedprice != "" and dateedit == "":
+
+                self.updateprice(editeditem, editedprice)
+
+                self.show_toast("Item Edited Successfully without repurchased date")
+
+                con = sql.connect('goods.db')
+
+                cur = con.cursor()
+
+                cur.execute("SELECT * FROM itemgood")
+
+                item = cur.fetchall()
+
+                print(item)
+
+#                self.container.clear_widgets()
+
+#                self.containers.clear_widgets()
+
+                #DemoApp().on_start()
+
+                self.clr()
+
+                self.vs()
+
+            elif editedprice == "" and dateedit != "":
+
+                self.updatedate(editeditem, dateedit)
+
+                self.show_toast("Item Edited Successfully")
+
+                con = sql.connect('goods.db')
+
+                cur = con.cursor()
+
+                cur.execute("SELECT * FROM itemgood")
+
+                item = cur.fetchall()
+
+                print(item)
+
+#                self.container.clear_widgets()
+
+#                self.containers.clear_widgets()
+
+                #DemoApp().on_start()
+
+                self.clr()
+
+                self.vs()
+
+        else:
+
+            self.show_toast("Please input item name")
+
+                
+
+                
+
+                
+
+                
+
+                    
+
+        if len(datee) > 25:
+
+            datee = self.datelabeledit.text
+
+            #self.show_toast("Repurchased date was added")
+
+        else:
+
+            datee = ""
+
+           
+
+     ## creates a variable that is false and used to open the refresh list button when true
+
+    global rl
+
+    rl = False
+
+   
+
+        
+
+     ## Function called when an item database is updated, it clears the list and opens the refresh button so that the list can be  refreshed    
+
+    def clr(self):
+
+        self.container.clear_widgets()
+
+        self.containers.clear_widgets()
+
+        global rl
+
+        rl = True
+
+        if rl == True:
+
+            self.rl.disabled = False
+
+        
+
+        
+
+    ## This Function is called when the refresh button is clicked, it takes the updated list and displays it, then the refresh list button is disabled again.
+
+    def refresh(self):
+
+        con = sql.connect("goods.db")
+
+        cur = con.cursor()
+
+        cur.execute("SELECT * FROM itemgood")
+
+        itemlist = cur.fetchall()
+
+        print(itemlist)
+
+        self.show_toast("Connected")
+
+        #self.sc.remove_widget(self.containers)
+
+        #self.containers.clear_widgets()
+
+        t = 0
+
+        global rl
+
+        rl = False
+
+        self.rl.disabled = True
+
+        try:
+
+            while t>=0:
+
+                
+
+                icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+                self.containers.add_widget(icon)
+
+                self.containers.add_widget (ThreeLineListItem(text=itemlist[t][0], secondary_text="Last Purchased: " + str(itemlist[t][2]), tertiary_text="Price: " + str(itemlist[t][1])))
+
+                
+
+                icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+                self.container.add_widget(icon)
+
+                self.container.add_widget (ThreeLineListItem(text=itemlist[t][0], secondary_text="Last Purchased: " + str(itemlist[t][2]), tertiary_text="Price: " + str(itemlist[t][1])))
+
+                
+
+                t=t+1
+
+                self.show_toast("List is refreshed")
+
+        except:
+
+            #self.show_toast("Bad")
+
+            pass
+
+        
+
+    
+
+    
+
+    ### Create Database For Storing User Data ###
+
+    try:
+
+        con = sql.connect('goods.db')
+
+        cur = con.cursor()
+
+        cur.execute(""" CREATE TABLE itemgood(
+
+        item blod,
+
+        price blob,
+
+        date blob
+
+        )""")
+
+        con.commit()
+
+        con.close()
+
+        print("Table Created Successfully")
+
+    except:
+
+        print('Table exists')
+
+        
+
+    def addgood(self):
+
+        item = self.item.text
+
+        price = self.price.text
+
+        
+
+        icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+        self.containers.add_widget(icon)
+
+        self.containers.add_widget(
+
+        ThreeLineListItem(text=item, secondary_text="Last Purchased: " + str(self.date), tertiary_text="Price: " + str(price), on_press=lambda x: root.editscreen()
+
+           )
+
+           )
+
+     
+
+    scr_mngr = ObjectProperty(None)
+
+    
+
+    toolbar = ObjectProperty(None)
+
+       
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        
+
+    ## Function called when register new item button is clicked, it takes you to the register item screen
+
+    def news(self):
+
+        self.scr_mngr.current = 'screen2'
+
+        
+
+     ## Function that takes you back to home screen
+
+    def homes(self):
+
+        self.scr_mngr.current = 'screen1'
+
+   
+
+    ## Function that takes you to view item list screen     
+
+    def vs(self):
+
+        self.scr_mngr.current = 'screen3'
+
+        
+
+    ##Function that takes you to edit item screen
+
+    def editroom(self):
+
+        self.scr_mngr.current = 'screen4'
+
+        
+
+     
+
+    ## This Function is called when a new item is trying to be registered, it checks it's values, validates it and stores it in the database. Then it updates the list
+
+    def additem(self):
+
+        item = self.item.text
+
+        price = self.price.text
+
+        datte = self.datelabel
+
+        if item != "" and price != "" and datte != "":
+
+            ### Connect to Users Database ##
+
+            con = sql.connect("goods.db")
+
+            cur = con.cursor()
+
+            cur.execute("SELECT * FROM itemgood")
+
+            itemlist = cur.fetchall()
+
+            try:
+
+                t = 0
+
+                while t>=0:
+
+                    uu = itemlist[t][0]
+
+                    if uu == item:
+
+                        break
+
+                    t+=1
+
+            except:
+
+                uu = ""
+
+            if (uu == item):
+
+                self.show_toast("Item Already Exists")
+
+            else:
+
+                self.addgood()
+
+                try:
+
+                    ## Add create account details to users database table after validation is successful ##
+
+                    con = sql.connect("goods.db")
+
+                    cur = con.cursor()
+
+                    cur.execute(""" INSERT INTO itemgood(item, price, date) VALUES (?, ?, ?)""", (item, price, self.date))
+
+                    con.commit()
+
+                    con.close()
+
+                    self.scr_mngr.current = 'screen1'
+
+                    self.show_toast("Item registered successfully")
+
+                    icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+                    self.container.add_widget(icon)
+
+                    self.container.add_widget(
+
+                    ThreeLineListItem(text=item, secondary_text="Last Purchased: " + str(self.date), tertiary_text="Price: " + str(price)
+
+                            )
+
+                            )
+
+                    self.containers.add_widget(icon)
+
+                    self.containers.add_widget(
+
+                    ThreeLineListItem(text=item, secondary_text="Last Purchased: " + str(self.date), tertiary_text="Price: " + str(price)
+
+                    )
+
+                    )
+
+                    self.item.text = ("")
+
+                    self.price.text = ("")
+
+                except:
+
+                    self.show_toast("Please pick a purchase date")
+
+        else:
+
+            self.show_toast("Please fill all input")
+
+        
+
+     
+
+     ##This function is used to pop up a message to the screen
+
+    def show_toast(self, ti):
+
+        '''Displays a toast on the screen.'''
+
+        
+
+        toast(ti)
+
+    
+
+####################################
+
+###               Main Layout Class Ends                  ###
+
+####################################
+
+####################################
+
+###       Adding all Screen Together Starts         ###
+
+####################################
+
+### Home screen class in MyLayout ##
+
+class HomeScreen(Screen):
+
+    pass
+
+    
+
+### register new item screen class in MyLayout ##
+
+class NewScreen(Screen):
+
+    pass
+
+    
+
+### view screen class in MyLayout ##
+
+class ViewScreen(Screen):
+
+    pass
+
+### edit item screen class in MyLayout ##
+
+class EditScreen(Screen):
+
+    pass
+
+## Create the screen manager ##
+
+sm = ScreenManager()
+
+## Add all the screens 
+
+sm.add_widget(HomeScreen(name='screen1'))
+
+sm.add_widget(NewScreen(name='screen2'))
+
+sm.add_widget(ViewScreen(name='screen3'))
+
+sm.add_widget(EditScreen(name='screen4'))
+
+####################################
+
+###        Adding all Screen Together Ends          ###
+
+####################################
+
+####################################
+
+###                Main App Class Starts                  ###
+
+####################################
+
+ 
+
+##########    Main App Class   ##########
+
+class DemoApp(MDApp):
+
+    
+
+            
+
+    ##########   Main App Function  ##########
+
+    def build(self):
+
+            
+
+        
+
+        ##########  Build all screens   ##########
+
+        screen = Builder.load_string(screens)
+
+        
+
+        ### Return built screens ##
+
+        return screen
+
+        
+
+    ## function that takes you to the edit screen
+
+    def editroom(self):
+
+        self.root.scr_mngr.current = 'screen4'
+
+        
+
+        
+
+    ## This function is called when the app is run. it calls the two functions for listing all the items in both the view screen and home screen
+
+    def on_start(self):
+
+        print("on start")
+
+        global y
+
+        y = True
+
+        try:
+
+            self.root.ids.containers.clear_widgets()
+
+        except:
+
+            print ("didn't do it noooooo")
+
+        while y == True:
+
+            self.one()
+
+            self.two()
+
+        
+
+    ## this function is used to list items in view screen
+
+    def one(self):
+
+        #self.root.ids.containers.clear_widgets()
+
+        con = sql.connect('goods.db')
+
+        cur = con.cursor()
+
+        cur.execute("SELECT * FROM itemgood")
+
+        item = cur.fetchall()
+
+        t = 0
+
+        try:
+
+            while t >=0:
+
+               # print(item[t][0])
+
+#                print(item[t][2])
+
+#                print(item[t][1])
+
+                icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+                self.root.ids.containers.add_widget(icon)
+
+                self.root.ids.containers.add_widget(
+
+                ThreeLineListItem(text=item[t][0], secondary_text="Last Purchased: " + str(item[t][2]), tertiary_text="Price: " + str(item[t][1])
+
+                )
+
+                )
+
+                t=t+1
+
+                print("i")
+
+        except:
+
+            global y
+
+            y = False
+
+            
+
+            
+
+    ## this function is used to list items in home screen
+
+    def two(self):
+
+        #self.root.ids.container.clear_widgets()
+
+        con = sql.connect('goods.db')
+
+        cur = con.cursor()
+
+        cur.execute("SELECT * FROM itemgood")
+
+        item = cur.fetchall()
+
+        t = 0
+
+        try:
+
+            while t >=0:
+
+                #print(item[t][0])
+
+#                print(item[t][2])
+
+#                print(item[t][1])
+
+                icon = IconLeftWidget(icon="food", theme_text_color="Custom", text_color=(0,0,1,1))
+
+                self.root.ids.container.add_widget(icon)
+
+                self.root.ids.container.add_widget(
+
+                ThreeLineListItem(text=item[t][0], secondary_text="Last Purchased: " + str(item[t][2]), tertiary_text="Price: " + str(item[t][1])
+
+                    )
+
+                    )
+
+                t=t+1
+
+                print("love")
+
+        except:
+
+            global y
+
+            y = False
+
+            
+
+        
+
+####################################
+
+###                  Main App Class Ends                   ###
+
+####################################
+
+            
+
+      
+
+      
+
+##########    Run the app    ##########
+
+if __name__ == '__main__':
+
+    DemoApp().run();
